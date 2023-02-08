@@ -17,7 +17,7 @@ Lamp_off_img="/home/ubuntu/TG_BOT/OffLamp.png"
 packet_prev=`cat /home/ubuntu/TG_BOT/watch.txt`
 
 #Ping check
-packet=$(ping -c 1 "$host_ip" | grep "packet loss" | awk -F ',' '{print $3}' | awk '{print $1}' | awk -F '%' '{print $1}')
+packet=$(ping -c 10 "$host_ip" | grep "packet loss" | awk -F ',' '{print $3}' | awk '{print $1}' | awk -F '%' '{print $1}')
 
 
 date=$(date '+%s')
@@ -48,9 +48,18 @@ date_state() {
 if [ "$packet" != "$packet_prev" ] ; then
 echo $packet > /home/ubuntu/TG_BOT/watch.txt
         if [ "$packet" = "0" ] ; then
-                date_state
-                power_on
+                if [ "$packet" = "0" ] ; then
+                if [ "$packet_prev" -gt "90" ] ; then
+                        date_state
+                        power_on
+                else
+                        echo "fail" > /dev/null
+                fi
+
         elif [ "$packet" = "100" ] ; then
+                date_state
+                power_off
+ 	elif [ "$packet" = "+10" ] ; then
                 date_state
                 power_off
         fi
